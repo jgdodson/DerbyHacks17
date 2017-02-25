@@ -9,9 +9,9 @@ def group_by_establishment(rows):
 
   for row in rows:
     if row[0] in groups:
-      groups[row[0]].append(row[1:])
+      groups[row[0]]['scores'].append([row[1], row[6], row[7]])
     else:
-      groups[row[0]] = [row[1:]]
+      groups[row[0]] = {'zip': row[2], 'lat': row[4], 'long': row[5], 'type': row[3], 'scores': [[row[1], row[6], row[7]]]}
 
   return groups
 
