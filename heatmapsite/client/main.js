@@ -26,7 +26,7 @@ Template.picturebox.events({
 
   "click .fa-arrow-right" (event){
     num = Session.get('picnum');
-    if(num < 2){
+    if(num < 3){
       num = num +1;
       Session.set('picnum', num)
     }
