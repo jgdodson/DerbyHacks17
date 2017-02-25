@@ -12,7 +12,7 @@ with open(pre_2017_data, 'r') as f:
   csv_reader = csv.reader(f)
 
   for row in csv_reader:
-    if row[0] in data and len(row[1]) > 0:
+    if row[0] in data and len(row[1]) > 0 and row[4] == 'REGULAR':
       old_date = str(row[2])
       mm, dd, yy = old_date[4:6], old_date[6:8], old_date[:4]
       new_date = '/'.join([mm,dd,yy])
