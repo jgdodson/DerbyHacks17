@@ -38,6 +38,6 @@ fig = plt.figure()
 
 ax = fig.add_subplot(111)
 
-plt.pcolormesh(X, Y, H, vmin=0)
+plt.pcolormesh(X, Y, H)
 
 plt.show()
