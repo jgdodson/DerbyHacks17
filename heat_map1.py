@@ -38,6 +38,10 @@ fig = plt.figure()
 
 ax = fig.add_subplot(111)
 
+<<<<<<< HEAD
 plt.pcolormesh(X, Y, H, vmin=0)
+=======
+plt.pcolormesh(X, Y, H)
+>>>>>>> origin/Mkkeffeler1
 
 plt.show()
