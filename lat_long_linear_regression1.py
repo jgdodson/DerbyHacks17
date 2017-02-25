@@ -1,6 +1,7 @@
 import json
 import numpy as np
 from sklearn import linear_model, svm
+from sklearn.neural_network import MLPRegressor
 import pandas as pd
 import sys
 from datetime import datetime
@@ -9,7 +10,7 @@ import math
 def addParams(dataDict):
     radius311 = .1
     maxMonthsBack = 10
-    get311General(dataDict, radius311, maxMonthsBack)
+    # get311General(dataDict, radius311, maxMonthsBack)
 
 #model attribute generators should only add new keys to dict
 def get311General(dataDict, radius, monthsBack):
@@ -54,7 +55,7 @@ def main():
       # Only include restaurants with at least 3 inspections
       if len(d['scores']) >= 3:
         avg_score = sum([score[2] for score in d['scores']]) / len(d['scores'])
-        lat_long = [d['lat'], d['long'], d['general311Incidents']]
+        lat_long = [d['lat'], d['long']]
         pairs.append([lat_long, avg_score])
 
     # Shuffle the data instances
@@ -75,14 +76,18 @@ def main():
     # Initialize the model
     reg = linear_model.LinearRegression()
     svreg = svm.SVR()
+    neural = MLPRegressor(hidden_layer_sizes=(100), solver="lbfgs", activation="logistic")
 
     # Train the model
     reg.fit(train_X, train_Y)
     svreg.fit(train_X, train_Y)
+    neural.fit(train_X,train_Y)
+
 
     # Test the model
     print('Linear Reg: {}'.format(reg.score(test_X, test_Y)))
     print('SVG Reg: {}'.format(svreg.score(test_X, test_Y)))
+    print('neural MLPRegressor: {}'.format(neural.score(test_X, test_Y)))
 
 if __name__ == "__main__":
     main()
