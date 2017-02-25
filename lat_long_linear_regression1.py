@@ -59,7 +59,7 @@ def main():
         pairs.append([lat_long, avg_score])
 
     # Shuffle the data instances
-    np.random.shuffle(pairs)
+    #np.random.shuffle(pairs)
 
     # Split the data into train and test sets
     train_data = pairs[:-100]
@@ -74,7 +74,7 @@ def main():
     test_Y = [d[1] for d in test_data]
 
     # Initialize the model
-    reg = linear_model.LinearRegression()
+    reg = linear_model.LinearRegression(normalize=True)
     svreg = svm.SVR()
     neural = MLPRegressor(hidden_layer_sizes=(100), solver="lbfgs", activation="logistic")
 
