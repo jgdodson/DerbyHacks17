@@ -1,0 +1,41 @@
+/* CSS declarations go here */
+/* centered columns styles */
+
+body{
+  background: #E0FFFF!important;
+}
+
+.grey-column{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+}
+
+.centerpic{
+  position: relative;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 15px;
+  background-color: #d3d3d3;
+  }
+
+.arrowbar{
+  position: relative;
+}
+
+.fa{
+  font-size: 5em;
+  cursor: pointer;
+}
+
+.fa-arrow-left{
+  float: left;
+  margin-left: 12px;
+}
+
+.fa-arrow-right{
+  float: right;
+  margin-right: 12px;
+}
