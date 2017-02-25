@@ -35,9 +35,6 @@ def get311General(dataDict, radius, monthsBack):
                         entry["general311Incidents"] += 1
 
 
-
-
-
 def main():
 
     input_file = 'clean_data/grouped_louisville_inspections.json'
