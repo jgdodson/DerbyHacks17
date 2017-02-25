@@ -7,7 +7,6 @@ import sys
 from datetime import datetime
 import math
 
-<<<<<<< HEAD
 input_file = 'clean_data/combined_inspection_data.json'
 
 # Load the dataset
