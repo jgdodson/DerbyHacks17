@@ -11,7 +11,7 @@ Template.picturebox.onCreated(function (){
 Template.picturebox.helpers({
   picPath(){
     n = Session.get('picnum');
-    return "./d"+ n.toString() + ".jpg"
+    return "./d"+ n.toString() + ".png"
   }
 })
 
@@ -26,9 +26,12 @@ Template.picturebox.events({
 
   "click .fa-arrow-right" (event){
     num = Session.get('picnum');
-    if(num < 2){
-      num = num +1;
-      Session.set('picnum', num)
-    }
+    num = num +1;
+    Session.set('picnum', num)
+  },
+
+  "error img" (event){
+    n = Session.get("picnum");
+    Session.set("picnum", n-1);
   }
 })
