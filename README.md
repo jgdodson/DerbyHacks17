@@ -37,4 +37,4 @@ TBD
 
 ## License
 [LICENSE]
-https://data.louisvilleky.gov/dataset/restaurant-inspection-data/resource/db8b128e-aed3-4622-8059-1ffb74f652c6#{view-graph:{graphOptions:{hooks:{processOffset:{},bindEvents:{}}}},graphOptions:{hooks:{processOffset:{},bindEvents:{}}},view-map:{lonField:!Longitude,latField:!Latitude}})
+(https://data.louisvilleky.gov/dataset/restaurant-inspection-data/resource/db8b128e-aed3-4622-8059-1ffb74f652c6#{view-graph:{graphOptions:{hooks:{processOffset:{},bindEvents:{}}}},graphOptions:{hooks:{processOffset:{},bindEvents:{}}},view-map:{lonField:!Longitude,latField:!Latitude}})
