@@ -9,23 +9,6 @@ import math
 
 input_file = 'clean_data/combined_inspection_data.json'
 
-<<<<<<< HEAD:lat_long_linear_regression1.py
-=======
-# Load the dataset
-with open(input_file, 'r') as f:
-  data = dict(json.load(f))
-
-# Pairs of inputs and targets for regression
-pairs = []
-
-for d in data.values():
-  # Only include restaurants with at least 3 inspections
-  if 10 <= len(d['scores']) <= 30:
-    avg_score = np.mean([score[2] for score in d['scores']])
-    lat_long = [d['lat'], d['long']]
-    pairs.append([lat_long, avg_score])
-
->>>>>>> origin/Mkkeffeler1:lat_long_linear_regression2.py
 def main():
     #File now contains number of health inspection violations respective to each business 
     input_file = 'clean_data/grouped_louisville_inspections_yelp_violations.json'
