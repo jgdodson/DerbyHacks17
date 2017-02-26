@@ -127,9 +127,9 @@ def main():
 
 
     # Test the model
-    print('Linear Reg: {}'.format(reg.score(test_X, test_Y,sample_weight=.5)))
-    print('SVG Reg: {}'.format(svreg.score(test_X, test_Y,sample_weight=.5)))
-    print('neural MLPRegressor: {}'.format(neural.score(test_X, test_Y,sample_weight=.5)))
+    print('Linear Reg: {}'.format(reg.score(test_X, test_Y)))
+    print('SVG Reg: {}'.format(svreg.score(test_X, test_Y)))
+    print('neural MLPRegressor: {}'.format(neural.score(test_X, test_Y)))
 
 if __name__ == "__main__":
     main()
