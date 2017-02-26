@@ -9,12 +9,14 @@ import math
 
 def addParams(dataDict):
     radius311 = .1
-    maxMonthsBack = 10
+    maxMonthsBack = 12
     get311General(dataDict, radius311, maxMonthsBack)
 
 #model attribute generators should only add new keys to dict
 def get311General(dataDict, radius, monthsBack):
-    complaintFile = open("./Data/Citizen311Data_STD.csv")
+    #311cleanup.py is used to limit the number of 311 searchable calls down to a given time period (12 months as of now), speeding up run time considerably
+    #If this time period is to be changed, please run 311cleanup with updated parameter and change the parameter here (maxMonthBack)
+    complaintFile = open("clean_data/Citizen311Data_2017_STD.csv")
     tabulated311 = pd.read_csv(complaintFile)
     complaintFile.close()
 
@@ -40,17 +42,39 @@ def get311General(dataDict, radius, monthsBack):
 
 def main():
     #File now contains number of health inspection violations respective to each business 
+
     input_file = 'clean_data/grouped_louisville_inspections_yelp_violations.json'
 
     with open(input_file, 'r') as f:
       data = dict(json.load(f))
 
     businesses = []
+    ins = []
+#Hard code the decimal values for total occurences of 1 inspection->12 inspections (at one business)
+    ins.append(1018/4199)
+    ins.append(2320/4199)
+    ins.append(461/4199)
+    ins.append(299/4199)
+    ins.append(25/4199)
+    ins.append(60/4199)
+    ins.append(3/4199)
+    ins.append(10/4199)
+    #No businesses had 9 inspections
+    ins.append(0)
+    ins.append(2/4199)
+    #No businesses had 11 inspections
+    ins.append(0)
+    ins.append(1/4199)
 
     #add params mutates 'data'!!!
     addParams(data)
 
+    total_score = 0
+    score_count = 0
     for d in data.values():
+      
+      inspection_count=0
+      total_score=0
 
       # Only include restaurants with at least 3 inspections
       if len(d['scores']) >= 3:
@@ -60,11 +84,16 @@ def main():
             violation_count = [d['violations']] 
         else: 
             violation_count=0
+      #For every inspection that this business had
+        for score in d['scores']:
+            #Add 1 to inspection count
+            inspection_count = inspection_count+1
+            total_score += score[2]
 
-        avg_score = sum([score[2] for score in d['scores']]) / len(d['scores'])
+        avg_score = total_score/inspection_count
         #Latitude and Longitude values with the inspection violation count in one variable
 
-        inputs = [d['lat'], d['long'],d['violations'],]
+        inputs = [d['lat'], d['long'],d['violations'], ins[score_count-1]]
         businesses.append([inputs, avg_score])
 
     # Shuffle the data instances
