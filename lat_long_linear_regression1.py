@@ -55,12 +55,20 @@ def normalizeTuples(arr):
             tarr.append(n[0][i])
         avg = np.mean(tarr)
         std = np.std(tarr)
+        hi = max(tarr)
+        lo = min(tarr)
 
         j=0
         while j < len(arr):
             arr[j][0][i] = arr[j][0][i] - avg
             arr[j][0][i] = arr[j][0][i] / std
             j = j+1
+
+        # j=0
+        # while j < len(arr):
+        #     arr[j][0][i] = arr[j][0][i] - lo
+        #     arr[j][0][i] = arr[j][0][i] / (hi - lo)
+        #     j = j+1
 
         i = i + 1
 
@@ -69,19 +77,23 @@ def normalizeScore(arr):
     tarr = []
     for n in arr:
         tarr.append(n[1])
+    hi = max(tarr)
+    lo = min(tarr)
     avg = np.mean(tarr)
     std = np.std(tarr)
     for n in arr:
         n[1] = n[1] - avg
         n[1] = n[1] / std
-
+    # for n in arr:
+    #     n[1] = n[1] - lo
+    #     n[1] = n[1] / (hi - lo)
 def makeHeat(dataDict):
     heat = []
     for entry in dataDict.values():
         scoreArray = []
         i = 0
         while i < len(entry['scores']):
-            scoreArray.append(float(entry['scores'][i][0]))
+            scoreArray.append(entry['scores'][i][2])
             i += 1
 
         if len(entry["scores"])>0:
@@ -90,9 +102,12 @@ def makeHeat(dataDict):
     return heat
 
 def getHeat(x, y, heatmap):
-    hotness = 0.0
-    for s in heatmap:
-        hotness = hotness + s["heat"]/((math.hypot(s["x"] - x, s["y"] - y))**2)
+    hotness = 0
+    for spot in heatmap:
+        denominator = int((math.hypot(spot["x"] - x, spot["y"] - y)*1000)**2)
+        if denominator > .000001:
+            hotness = hotness + int(spot["heat"])/denominator
+
     return hotness
 
 def main():
@@ -103,14 +118,7 @@ def main():
     with open(input_file, 'r') as f:
       data = dict(json.load(f))
 
-    for d in data.values():
-        gg = []
-        for i, l in enumerate(d["scores"]):
-            if l[0] == 'Nan' or l[0] == 'NaN' or l[0] == 'nan' or l[0] == float('Nan') or l[0] == float('NaN') or l[0] == float('nan'):
-                gg.append(i)
-        j = 0
-        while j < len(gg):
-            del(d['scores'][gg[j]])
+
     businesses = []
     ins = []
     heatmap = makeHeat(data)
@@ -132,7 +140,7 @@ def main():
     ins.append(1/4199)
 
     #add params mutates 'data'!!!
-    addParams(data)
+    # addParams(data)
 
     total_score = 0
     score_count = 0
@@ -159,14 +167,14 @@ def main():
         #Latitude and Longitude values with the inspection violation count in one variable
 
         # inputs = [d['lat'], d['long'],d['violations'], ins[score_count-1]]
-        inputs = [float(getHeat(d['lat'], d['long'], heatmap)), float(d['violations']), float(d['general311Incidents'])]
+        inputs = [getHeat(float(d['lat']), float(d['long']), heatmap), -1*d['violations']]
         businesses.append([inputs, avg_score])
 
     print "CHECK"
-    print businesses[0][0], businesses[0][1]
-    # normalizeTuples(businesses)
-    # normalizeScore(businesses)
-    print businesses[0][0], businesses[0][1]
+    print businesses[0]
+    normalizeTuples(businesses)
+    normalizeScore(businesses)
+    print businesses[1]
     # Shuffle the data instances
     # np.random.shuffle(businesses)
 
@@ -186,16 +194,12 @@ def main():
     # Initialize the model
     reg = linear_model.LinearRegression()
     svreg = svm.SVR()
-    neural = MLPRegressor(hidden_layer_sizes=(100), solver="lbfgs", activation="logistic")
+    neural = MLPRegressor(hidden_layer_sizes=(3), solver="lbfgs", activation="relu", learning_rate="adaptive", batch_size=150)
 
     # Train the model
     reg.fit(train_X, train_Y)
     svreg.fit(train_X, train_Y)
     neural.fit(train_X,train_Y)
-
-
-
-
 
     # Test the model
     print('Linear Reg: {}'.format(reg.score(test_X, test_Y)))
