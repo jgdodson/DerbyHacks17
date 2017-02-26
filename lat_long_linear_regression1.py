@@ -77,16 +77,22 @@ def normalizeScore(arr):
 
 def makeHeat(dataDict):
     heat = []
-    for entry in dataDict:
-        if len(entry['scores'])>0:
-            heat.append({'x': entry['lat'], 'y': entry['long'], 'heat': np.mean(entry[scores])})
+    for entry in dataDict.values():
+        scoreArray = []
+        i = 0
+        while i < len(entry['scores']):
+            scoreArray.append(float(entry['scores'][i][0]))
+            i += 1
+
+        if len(entry["scores"])>0:
+            heat.append({"x": entry["lat"], "y": entry["long"], "heat": (np.mean(scoreArray))})
 
     return heat
 
 def getHeat(x, y, heatmap):
     hotness = 0.0
     for s in heatmap:
-        hotness = hotness + s['heat']/((math.hypot(s['x'] - x, s['y'] - y))**2)
+        hotness = hotness + s["heat"]/((math.hypot(s["x"] - x, s["y"] - y))**2)
     return hotness
 
 def main():
@@ -99,8 +105,8 @@ def main():
 
     businesses = []
     ins = []
-    #make heatmap
     heatmap = makeHeat(data)
+    #make heatmap
 #Hard code the decimal values for total occurences of 1 inspection->12 inspections (at one business)
     ins.append(1018/4199)
     ins.append(2320/4199)
@@ -145,12 +151,12 @@ def main():
         #Latitude and Longitude values with the inspection violation count in one variable
 
         # inputs = [d['lat'], d['long'],d['violations'], ins[score_count-1]]
-        inputs = [getHeat(d['lat'], d['long'], heatmap), d['violations'], d['general311Incidents']]
+        inputs = [float(getHeat(d['lat'], d['long'], heatmap)), float(d['violations']), float(d['general311Incidents'])]
         businesses.append([inputs, avg_score])
 
     print "CHECK"
     print businesses[0][0], businesses[0][1]
-    normalizeTuples(businesses)
+    # normalizeTuples(businesses)
     normalizeScore(businesses)
     print businesses[0][0], businesses[0][1]
     # Shuffle the data instances
