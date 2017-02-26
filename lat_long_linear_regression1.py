@@ -64,6 +64,12 @@ def normalizeTuples(arr):
             arr[j][0][i] = arr[j][0][i] / std
             j = j+1
 
+        # j=0
+        # while j < len(arr):
+        #     arr[j][0][i] = arr[j][0][i] - lo
+        #     arr[j][0][i] = arr[j][0][i] / (hi - lo)
+        #     j = j+1
+
         i = i + 1
 
 
@@ -71,12 +77,16 @@ def normalizeScore(arr):
     tarr = []
     for n in arr:
         tarr.append(n[1])
+    hi = max(tarr)
+    lo = min(tarr)
     avg = np.mean(tarr)
     std = np.std(tarr)
     for n in arr:
         n[1] = n[1] - avg
         n[1] = n[1] / std
-
+    # for n in arr:
+    #     n[1] = n[1] - lo
+    #     n[1] = n[1] / (hi - lo)
 def makeHeat(dataDict):
     heat = []
     for entry in dataDict.values():
@@ -94,7 +104,7 @@ def makeHeat(dataDict):
 def getHeat(x, y, heatmap):
     hotness = 0
     for spot in heatmap:
-        denominator = int((math.hypot(spot["x"] - x, spot["y"] - y))**2)
+        denominator = int((math.hypot(spot["x"] - x, spot["y"] - y)*1000)**2)
         if denominator > .000001:
             hotness = hotness + int(spot["heat"])/denominator
 
@@ -157,7 +167,7 @@ def main():
         #Latitude and Longitude values with the inspection violation count in one variable
 
         # inputs = [d['lat'], d['long'],d['violations'], ins[score_count-1]]
-        inputs = [getHeat(float(d['lat']), float(d['long']), heatmap), d['violations']]
+        inputs = [getHeat(float(d['lat']), float(d['long']), heatmap), -1*d['violations']]
         businesses.append([inputs, avg_score])
 
     print "CHECK"
@@ -184,16 +194,12 @@ def main():
     # Initialize the model
     reg = linear_model.LinearRegression()
     svreg = svm.SVR()
-    neural = MLPRegressor(hidden_layer_sizes=(1), solver="adam", activation="logistic", learning_rate="adaptive", batch_size=150)
+    neural = MLPRegressor(hidden_layer_sizes=(3), solver="lbfgs", activation="relu", learning_rate="adaptive", batch_size=150)
 
     # Train the model
     reg.fit(train_X, train_Y)
     svreg.fit(train_X, train_Y)
     neural.fit(train_X,train_Y)
-
-
-
-
 
     # Test the model
     print('Linear Reg: {}'.format(reg.score(test_X, test_Y)))
