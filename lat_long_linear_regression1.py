@@ -8,7 +8,7 @@ from datetime import datetime
 import math
 
 def addParams(dataDict):
-    radius311 = .1
+    radius311 = .06
     maxMonthsBack = 12
     get311General(dataDict, radius311, maxMonthsBack)
 
@@ -25,7 +25,8 @@ def get311General(dataDict, radius, monthsBack):
 
     for i,srid in enumerate(tabulated311.service_request_id):
         pct = float(i)/float(len(tabulated311.service_request_id))*100.0
-        print pct
+        if int(pct)%10 == 0:
+            print pct
         if len(str(tabulated311.requested_datetime[i])) >= 17 and len(str(tabulated311.requested_datetime[i])) <= 23:
             today = datetime.now()
             prev = datetime.strptime(str(tabulated311.requested_datetime[i]), "%Y-%m-%d %H:%M:%S")
@@ -34,14 +35,62 @@ def get311General(dataDict, radius, monthsBack):
                 incidentLong = tabulated311.longitude[i]
                 for entry in dataDict.values():
                     if(math.hypot(incidentLat-entry["lat"], incidentLong - entry["long"]) < radius):
-                        entry["general311Incidents"] += 1
+                        keyfound = False
+                        text = tabulated311.description[i].split()
+                        for l in ['GARBAGE','TRASH','JUNK',	'DEAD',	'CART',	'RATS']:
+                            if l in text:
+                                keyfound = True
+                                break
+                        if keyfound:
+                            entry["general311Incidents"] += 1
 
 
 
+def normalizeTuples(arr):
+    i = 0
+    while i < len(arr[0][0]):
+        #make an array
+        tarr = []
+        for n in arr:
+            tarr.append(n[0][i])
+        avg = np.mean(tarr)
+        std = np.std(tarr)
 
+        j=0
+        while j < len(arr):
+            arr[j][0][i] = arr[j][0][i] - avg
+            arr[j][0][i] = arr[j][0][i] / std
+            j = j+1
+
+        i = i + 1
+
+
+def normalizeScore(arr):
+    tarr = []
+    for n in arr:
+        tarr.append(n[1])
+    avg = np.mean(tarr)
+    std = np.std(tarr)
+    for n in arr:
+        n[1] = n[1] - avg
+        n[1] = n[1] / std
+
+def makeHeat(dataDict):
+    heat = []
+    for entry in dataDict:
+        if len(entry['scores'])>0:
+            heat.append({'x': entry['lat'], 'y': entry['long'], 'heat': np.mean(entry[scores])})
+
+    return heat
+
+def getHeat(x, y, heatmap):
+    hotness = 0.0
+    for s in heatmap:
+        hotness = hotness + s['heat']/((math.hypot(s['x'] - x, s['y'] - y))**2)
+    return hotness
 
 def main():
-    #File now contains number of health inspection violations respective to each business 
+    #File now contains number of health inspection violations respective to each business
 
     input_file = 'clean_data/grouped_louisville_inspections_yelp_violations.json'
 
@@ -50,6 +99,8 @@ def main():
 
     businesses = []
     ins = []
+    #make heatmap
+    heatmap = makeHeat(data)
 #Hard code the decimal values for total occurences of 1 inspection->12 inspections (at one business)
     ins.append(1018/4199)
     ins.append(2320/4199)
@@ -72,7 +123,7 @@ def main():
     total_score = 0
     score_count = 0
     for d in data.values():
-      
+
       inspection_count=0
       total_score=0
 
@@ -80,9 +131,9 @@ def main():
       if len(d['scores']) >= 3:
         #If a violation count exists for this business, set it. If not, its 0.
         violation_count=0
-        if(d['violations']): 
-            violation_count = [d['violations']] 
-        else: 
+        if(d['violations']):
+            violation_count = [d['violations']]
+        else:
             violation_count=0
       #For every inspection that this business had
         for score in d['scores']:
@@ -93,11 +144,17 @@ def main():
         avg_score = total_score/inspection_count
         #Latitude and Longitude values with the inspection violation count in one variable
 
-        inputs = [d['lat'], d['long'],d['violations'], ins[score_count-1]]
+        # inputs = [d['lat'], d['long'],d['violations'], ins[score_count-1]]
+        inputs = [getHeat(d['lat'], d['long'], heatmap), d['violations'], d['general311Incidents']]
         businesses.append([inputs, avg_score])
 
+    print "CHECK"
+    print businesses[0][0], businesses[0][1]
+    normalizeTuples(businesses)
+    normalizeScore(businesses)
+    print businesses[0][0], businesses[0][1]
     # Shuffle the data instances
-    np.random.shuffle(businesses)
+    # np.random.shuffle(businesses)
 
     # Use all the data except for the last 100 businesses as training, rest are testing
     train_data = businesses[:-100]
@@ -115,13 +172,13 @@ def main():
     # Initialize the model
     reg = linear_model.LinearRegression()
     svreg = svm.SVR()
-    neural = MLPRegressor(hidden_layer_sizes=(100), solver="sgd", activation="logistic",learning_rate="invscaling",learning_rate_init=.05)
+    neural = MLPRegressor(hidden_layer_sizes=(100), solver="lbfgs", activation="logistic")
 
     # Train the model
     reg.fit(train_X, train_Y)
     svreg.fit(train_X, train_Y)
     neural.fit(train_X,train_Y)
-   
+
 
 
 
@@ -133,5 +190,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
