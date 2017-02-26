@@ -103,6 +103,14 @@ def main():
     with open(input_file, 'r') as f:
       data = dict(json.load(f))
 
+    for d in data.values():
+        gg = []
+        for i, l in enumerate(d["scores"]):
+            if l[0] == 'Nan' or l[0] == 'NaN' or l[0] == 'nan' or l[0] == float('Nan') or l[0] == float('NaN') or l[0] == float('nan'):
+                gg.append(i)
+        j = 0
+        while j < len(gg):
+            del(d['scores'][gg[j]])
     businesses = []
     ins = []
     heatmap = makeHeat(data)
@@ -157,7 +165,7 @@ def main():
     print "CHECK"
     print businesses[0][0], businesses[0][1]
     # normalizeTuples(businesses)
-    normalizeScore(businesses)
+    # normalizeScore(businesses)
     print businesses[0][0], businesses[0][1]
     # Shuffle the data instances
     # np.random.shuffle(businesses)
